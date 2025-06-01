@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Star Map Transmission</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background-color: black;
+      color: #00ffcc;
+      font-family: 'Courier New', monospace;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding: 20px;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    #transmission {
+      white-space: pre-wrap;
+      font-size: 1.2rem;
+      line-height: 1.6;
+      max-width: 100%;
+      padding: 16px;
+      border: 2px solid #00ffcc;
+      box-shadow: 0 0 20px #00ffcc;
+      text-shadow: 0 0 5px #00ffcc;
+      margin-bottom: 20px;
+      width: 100%;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    #starMapBtn {
+      display: none;
+      padding: 12px 24px;
+      background-color: #00ffcc;
+      border: none;
+      color: black;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 6px;
+      box-shadow: 0 0 10px #00ffcc;
+      transition: background-color 0.3s ease;
+    }
+
+    #starMapBtn:hover {
+      background-color: #00ccaa;
+    }
+
+    audio {
+      display: none;
+    }
+
+    /* Small devices */
+    @media (max-width: 600px) {
+      #transmission {
+        font-size: 1rem;
+        padding: 12px;
+      }
+
+      #starMapBtn {
+        font-size: 0.9rem;
+        padding: 10px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="transmission"></div>
+<button id="starMapBtn" onclick="location.href='starmap.html'">Enter Star Map</button>
+<audio id="voice" src="./assests/voice.mp3"></audio>
+
+<script>
+  const message = `
+📡 Welcome to the Star Map, Commander.
+
+Initializing Celestial Navigation Systems...
+
+Galactic Coordinates Calibrated.
+
+Mission Parameters Uploaded.
+
+Prepare for Interstellar Journey.
+
+Engaging Warp Drive
+
+in 3... 2... 1...
+`;
+
+  const textContainer = document.getElementById("transmission");
+  const audio = document.getElementById("voice");
+  const button = document.getElementById("starMapBtn");
+
+  let index = 0;
+
+  function typeWriter() {
+    if (index < message.length) {
+      textContainer.innerHTML += message.charAt(index);
+      index++;
+      setTimeout(typeWriter, 60);
+    } else {
+      button.style.display = 'inline-block';
+    }
+  }
+
+  window.onload = () => {
+    audio.play();
+    typeWriter();
+  };
+</script>
+
+</body>
+</html>

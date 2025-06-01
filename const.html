@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Interactive Constellation Map</title>
+  <link rel="stylesheet" href="./css/index.css">
+</head>
+<body>
+  <section id="constellation-map">
+    <!-- Control Panel -->
+    <div class="controls">
+      <button onclick="triggerShootingStar()">🌠 Shooting Star</button>
+      <button onclick="toggleNebulae()">🌌 Toggle Nebulae</button>
+      <button onclick="back2()">🌌 Back</button>
+
+    </div>
+
+    <!-- Background twinkling stars -->
+    <div class="background-stars" id="background-stars"></div>
+
+    <!-- Nebulae -->
+    <div class="nebula horsehead" id="horsehead-nebula"></div>
+    <div class="nebula eagle" id="eagle-nebula"></div>
+
+    <!-- Galaxies -->
+    <div class="galaxy spiral-1" data-name="Andromeda Galaxy"></div>
+    <div class="galaxy spiral-2" data-name="Whirlpool Galaxy"></div>
+    <div class="galaxy dwarf" data-name="Large Magellanic Cloud"></div>
+
+    <!-- Shooting star -->
+    <div class="shooting-star" id="shooting-star"></div>
+
+    <!-- Galaxy info panel -->
+    <div class="galaxy-info" id="galaxy-info"></div>
+
+    <!-- Global SVG for all constellation lines -->
+    <svg id="global-lines" width="100%" height="100%">
+      <!-- Orion lines -->
+      <line id="orion-line1" class="constellation-line" data-constellation="orion"></line>
+      <line id="orion-line2" class="constellation-line" data-constellation="orion"></line>
+      <line id="orion-line3" class="constellation-line" data-constellation="orion"></line>
+      
+      <!-- Cassiopeia lines -->
+      <line id="cassiopeia-line1" class="constellation-line" data-constellation="cassiopeia"></line>
+      <line id="cassiopeia-line2" class="constellation-line" data-constellation="cassiopeia"></line>
+      <line id="cassiopeia-line3" class="constellation-line" data-constellation="cassiopeia"></line>
+      
+      <!-- Cygnus lines -->
+      <line id="cygnus-line1" class="constellation-line" data-constellation="cygnus"></line>
+      <line id="cygnus-line2" class="constellation-line" data-constellation="cygnus"></line>
+      <line id="cygnus-line3" class="constellation-line" data-constellation="cygnus"></line>
+    </svg>
+
+    <!-- Orion -->
+    <div class="constellation" id="orion" data-name="Orion">
+      <div class="star" id="orion-star1" style="top: 120px; left: 200px;"></div>
+      <div class="star" id="orion-star2" style="top: 200px; left: 300px;"></div>
+      <div class="star" id="orion-star3" style="top: 140px; left: 400px;"></div>
+    </div>
+
+    <!-- Cassiopeia -->
+    <div class="constellation" id="cassiopeia" data-name="Cassiopeia">
+      <div class="star" id="cassiopeia-star1" style="top: 180px; left: 600px;"></div>
+      <div class="star" id="cassiopeia-star2" style="top: 160px; left: 680px;"></div>
+      <div class="star" id="cassiopeia-star3" style="top: 230px; left: 730px;"></div>
+      <div class="star" id="cassiopeia-star4" style="top: 210px; left: 800px;"></div>
+    </div>
+
+    <!-- Cygnus -->
+    <div class="constellation" id="cygnus" data-name="Cygnus">
+      <div class="star" id="cygnus-star1" style="top: 480px; left: 500px;"></div>
+      <div class="star" id="cygnus-star2" style="top: 530px; left: 570px;"></div>
+      <div class="star" id="cygnus-star3" style="top: 500px; left: 640px;"></div>
+      <div class="star" id="cygnus-star4" style="top: 540px; left: 710px;"></div>
+    </div>
+
+    <!-- Info Panel -->
+    <div id="constellation-info" class="info-panel"></div>
+  </section>
+
+  
+<script src="./js/index.js"></script>
+</body>
+</html>

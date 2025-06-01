@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/index.css">
+</head>
+
+<body>
+  <canvas id="stars1"></canvas>
+  <canvas id="stars2"></canvas>
+  <canvas id="stars3"></canvas>
+
+
+ 
+  
+  <div class="twinkle-stars"></div>
+  <div class="page-title">Galactic Constellation Network</div>
+  <!-- <audio id="introAudio" src="./assests/voice.mp3" preload="auto"></audio> -->
+  <script>
+    window.addEventListener("load", function () {
+      const audio = document.getElementById("introAudio");
+      audio.play();
+    });
+  </script>
+
+  <div class="nav-panel">
+    <button id="explore-btn" class="nav-btn nav-button""> 🌠 Explore</button>
+    <button id="mission-log-button" class=" nav-btn">🧾 Mission Log</button>
+    <button class="nav-btn">📡 Signals</button>
+    <button class="nav-btn" onclick="back3()">⬅️ Return</button>
+
+  </div>
+  <header class="constellation-header">
+    <h1>Welcome to the Star Map, Commander!</h1>
+    <p>Tap on a constellation to learn its secrets.</p>
+  </header>
+  <div class="sky-buttons">
+
+    <a href="const.html" class="back-button">Explore Sky</a>
+    <a href="const2.html" class="back-button">->More</a>
+  </div>
+  
+  <div id="explore-panel" class="explore-container hidden">
+    <a href="constellation.html" class="back-button">← Back to Constellation</a>
+    <h2 class="panel-title">🧭 Star Sectors</h2>
+    <div class="sectors-grid">
+      <div class="sector-card">
+        <img src="./assests/andromedia.webp" alt="Andromeda Drift">
+        <h3>Andromeda Drift</h3>
+        <p>Estimated arrival: 4.5 billion years.</p>
+      </div>
+      <div class="sector-card">
+        <img src="./assests/crimson.jpg" alt="Crimson Nebula">
+        <h3>Crimson Nebula</h3>
+        <p>Detecting protostar clusters and gas waves.</p>
+      </div>
+      <div class="sector-card">
+        <img src="./assests/titan.jpg" alt="Titan Base">
+        <h3>Titan Base</h3>
+        <p>Unknown subterranean patterns detected.</p>
+      </div>
+      <div class="sector-card">
+        <img src="./assests/singularity.jpg" alt="Singularity Edge">
+        <h3>Singularity Edge</h3>
+        <p>Signals distorted by gravitational time dilation.</p>
+      </div>
+      <div class="sector-card">
+        <img src="./assests/ancient.png" alt="Stellar Archive">
+        <h3>Stellar Archive</h3>
+        <p>Encrypted records from ancient civilizations found.</p>
+      </div>
+    </div>
+   
+
+  </div>
+
+
+  <!-- Mission Log Modal -->
+<div id="mission-log-modal" class="modal hidden">
+  <div class="modal-content">
+    <span class="close-button" id="close-log">&times;</span>
+    <h2>🧾 Mission Log</h2>
+    <div class="log-entries">
+      <p class="fiction"><strong>Mission: Andromeda Drift</strong><br>
+        Stardate 5472.3 — Entering uncharted gravitational fields.</p>
+    
+        <p class="real"><strong>Mission: Voyager Signal</strong><br>
+        Stardate 7412.4 — Voyager 1 crosses 24 billion km mark, still transmitting. Golden Record intact, drifting into interstellar space.</p>
+    
+        <p class="real"><strong>Mission: TRAPPIST-1 Scan</strong><br>
+        Stardate 8320.9 — Seven Earth-sized planets found orbiting a red dwarf. Three may hold liquid water. Monitoring signals.</p>
+    
+        <p class="real"><strong>Mission: Gravitational Echo</strong><br>
+        Stardate 7755.3 — Neutron stars collide. Detected gravitational waves and creation of heavy elements. Stellar event logged.</p>
+    
+        <p class="fiction"><strong>Mission: Stellar Archive</strong><br>
+        Stardate 5492.5 — First contact with encrypted astral logs.</p>
+        <h3>Add Your Own Log</h3>
+<textarea id="new-log" placeholder="Type your log entry here..."></textarea>
+<button id="save-log">💾 Save Log</button>
+
+    </div>
+  </div>
+</div>
+
+<!-- Signals Modal -->
+<div id="signals-modal" class="modal hidden">
+  <div class="modal-content">
+    <span class="close-button" id="close-signals">&times;</span>
+    <h2>📡 Signal Intercepts</h2>
+    <div class="signal-entries">
+      <p><strong>Signal: Pulsar Beacon</strong><br>
+        Repeating pattern from PSR B1919+21 — likely natural origin.</p>
+
+      <p><strong>Signal: WOW! Transmission</strong><br>
+        1977 Earth intercept — 72-second narrowband burst. No repeat.</p>
+
+      <p><strong>Signal: TRAPPIST Echo</strong><br>
+        Binary coded ping from system TRAPPIST-1e. Awaiting response...</p>
+
+      <p><strong>Signal: XZ-Tau Prime</strong><br>
+        Morse-like emissions decoded into mathematical constants.</p>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+<script>
+
+
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+            const panel = document.getElementById('explore-panel');
+            panel.style.scrollBehavior = 'smooth';
+        });
+const signalBtn = document.querySelector('.nav-btn:nth-child(3)'); // 📡 Signals button
+const signalsModal = document.getElementById('signals-modal');
+const closeSignalsBtn = document.getElementById('close-signals');
+
+signalBtn.addEventListener('click', () => {
+  signalsModal.classList.remove('hidden');
+});
+
+closeSignalsBtn.addEventListener('click', () => {
+  signalsModal.classList.add('hidden');
+});
+
+window.addEventListener('click', (e) => {
+  if (e.target === signalsModal) {
+    signalsModal.classList.add('hidden');
+  }
+});
+
+    const exploreBtn = document.getElementById("explore-btn");
+    const explorePanel = document.getElementById("explore-panel");
+
+    exploreBtn.addEventListener("click", () => {
+      explorePanel.classList.toggle("hidden");
+    });
+    const missionLogBtn = document.querySelector('#mission-log-button'); // Replace with your button's actual ID
+  const modal = document.querySelector('#mission-log-modal');
+  const closeBtn = document.querySelector('#close-log');
+
+  missionLogBtn.addEventListener('click', () => {
+    modal.classList.remove('hidden');
+  });
+
+  closeBtn.addEventListener('click', () => {
+    modal.classList.add('hidden');
+  });
+
+  // Optional: close modal on outside click
+  window.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.classList.add('hidden');
+    }
+  });
+
+
+  // save log
+  // Get DOM elements
+const newLogInput = document.querySelector('#new-log');
+const saveLogBtn = document.querySelector('#save-log');
+const logContainer = document.querySelector('.log-entries');
+
+// Load logs when modal is opened
+missionLogBtn.addEventListener('click', () => {
+  modal.classList.remove('hidden');
+  loadCustomLogs(); // Load all logs from storage
+});
+
+// Save log on button click
+saveLogBtn.addEventListener('click', () => {
+  const newLog = newLogInput.value.trim();
+
+  if (newLog !== "") {
+    const savedLogs = JSON.parse(localStorage.getItem('customLogs') || "[]");
+    savedLogs.push(newLog);
+    localStorage.setItem('customLogs', JSON.stringify(savedLogs));
+    newLogInput.value = ""; // Clear textarea
+    loadCustomLogs();       // Refresh display
+  }
+});
+
+
+
+
+// Function to load all logs (original + custom)
+function loadCustomLogs() {
+  const savedLogs = JSON.parse(localStorage.getItem('customLogs') || "[]");
+
+  const originalLogs = `
+    <p class="fiction"><strong>Mission: Andromeda Drift</strong><br>
+    Stardate 5472.3 — Entering uncharted gravitational fields.</p>
+
+    <p class="real"><strong>Mission: Voyager Signal</strong><br>
+    Stardate 7412.4 — Voyager 1 crosses 24 billion km mark, still transmitting. Golden Record intact, drifting into interstellar space.</p>
+
+    <p class="real"><strong>Mission: TRAPPIST-1 Scan</strong><br>
+    Stardate 8320.9 — Seven Earth-sized planets found orbiting a red dwarf. Three may hold liquid water. Monitoring signals.</p>
+
+    <p class="real"><strong>Mission: Gravitational Echo</strong><br>
+    Stardate 7755.3 — Neutron stars collide. Detected gravitational waves and creation of heavy elements. Stellar event logged.</p>
+
+    <p class="fiction"><strong>Mission: Stellar Archive</strong><br>
+    Stardate 5492.5 — First contact with encrypted astral logs.</p>
+  `;
+
+  // Render custom logs with delete buttons
+  const customLogs = savedLogs.map((log, index) => `
+    <div class="custom-log">
+      <p><strong>📝 Personal Log</strong><br>${log}</p>
+      <button class="delete-log" data-index="${index}">🗑️ Delete</button>
+    </div>
+  `).join("");
+
+  // Update log-entries container
+  logContainer.innerHTML = originalLogs + customLogs + `
+    <h3>Add Your Own Log</h3>
+    <textarea id="new-log" placeholder="Type your log entry here..."></textarea>
+    <button id="save-log">💾 Save Log</button>
+  `;
+
+  // Re-bind save log button
+  document.querySelector('#save-log').addEventListener('click', () => {
+    const input = document.querySelector('#new-log');
+    const newLog = input.value.trim();
+    if (newLog !== "") {
+      const updatedLogs = JSON.parse(localStorage.getItem('customLogs') || "[]");
+      updatedLogs.push(newLog);
+      localStorage.setItem('customLogs', JSON.stringify(updatedLogs));
+      input.value = "";
+      loadCustomLogs();
+    }
+  });
+
+  // Bind delete buttons
+   // Bind delete buttons
+   const deleteButtons = document.querySelectorAll('.delete-log');
+  deleteButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const index = parseInt(button.dataset.index);
+      let updatedLogs = JSON.parse(localStorage.getItem('customLogs') || "[]");
+      updatedLogs.splice(index, 1); // Remove the log by index
+      localStorage.setItem('customLogs', JSON.stringify(updatedLogs));
+      loadCustomLogs(); // Refresh the logs
+    });
+  });
+}
+function back3(){
+  window.location.href = 'index.html';
+}
+
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+<script src="./js/main.js"></script>
+<script src="./js/index.js"></script>
+</body>
+
+
+
+</html>

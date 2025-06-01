@@ -1,0 +1,872 @@
+body {
+  margin: 0;
+  padding: 20px;
+  background: #000;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow-x: auto;
+}
+
+#constellation-map {
+  position: relative;
+  width: 1000px;
+  height: 700px;
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(138, 43, 226, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 30%, rgba(25, 25, 112, 0.4) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(72, 61, 139, 0.3) 0%, transparent 50%),
+    linear-gradient(135deg, #001f3f 0%, #000814 100%);
+  border-radius: 15px;
+  margin: 2rem auto;
+  box-shadow: 0 0 50px #00f0ff88, inset 0 0 50px rgba(0, 240, 255, 0.1);
+  overflow: hidden;
+}
+
+/* Twinkling stars background */
+.background-stars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.bg-star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle 3s infinite ease-in-out;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* Galaxies */
+.galaxy {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, 
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(138, 43, 226, 0.6) 20%,
+    rgba(72, 61, 139, 0.4) 40%,
+    rgba(25, 25, 112, 0.3) 60%,
+    transparent 100%);
+  animation: galaxyRotate 20s linear infinite;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+.galaxy:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 30px rgba(138, 43, 226, 0.6);
+}
+
+.galaxy.spiral-1 {
+  width: 80px;
+  height: 40px;
+  top: 80px;
+  left: 50px;
+  animation-duration: 25s;
+}
+
+.galaxy.spiral-2 {
+  width: 100px;
+  height: 50px;
+  top: 300px;
+  left: 750px;
+  animation-duration: 30s;
+  animation-direction: reverse;
+}
+
+.galaxy.dwarf {
+  width: 40px;
+  height: 20px;
+  top: 500px;
+  left: 150px;
+  animation-duration: 15s;
+}
+
+@keyframes galaxyRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Nebulae */
+.nebula {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(ellipse,
+    rgba(255, 20, 147, 0.3) 0%,
+    rgba(138, 43, 226, 0.2) 30%,
+    rgba(0, 191, 255, 0.2) 60%,
+    transparent 100%);
+  animation: nebulaGlow 8s ease-in-out infinite alternate;
+  z-index: 0;
+}
+
+.nebula.horsehead {
+  width: 150px;
+  height: 100px;
+  top: 200px;
+  left: 400px;
+}
+
+.nebula.eagle {
+  width: 120px;
+  height: 80px;
+  top: 450px;
+  left: 300px;
+  animation-delay: -3s;
+}
+
+@keyframes nebulaGlow {
+  0% { opacity: 0.3; filter: blur(2px); }
+  100% { opacity: 0.6; filter: blur(1px); }
+}
+
+/* Shooting stars */
+.shooting-star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.shooting-star::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 1px;
+  background: linear-gradient(90deg, white, transparent);
+  top: 50%;
+  left: -20px;
+  transform: translateY(-50%);
+}
+
+.shooting-star.active {
+  animation: shoot 2s linear;
+}
+
+@keyframes shoot {
+  0% {
+    transform: translateX(0) translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(200px) translateY(100px);
+    opacity: 0;
+  }
+}
+
+#global-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.constellation {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.star {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 8px white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 3;
+  animation: starTwinkle 4s infinite ease-in-out;
+}
+
+@keyframes starTwinkle {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+.star.selected,
+.star:hover {
+  background: #00f0ff;
+  box-shadow: 0 0 20px #00f0ff, 0 0 30px #00f0ff88;
+  transform: scale(1.2);
+  animation: none;
+}
+
+.constellation-line {
+  stroke: #00f0ff;
+  stroke-width: 2;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  filter: drop-shadow(0 0 5px #00f0ff);
+}
+
+.constellation-line.visible {
+  opacity: 1;
+}
+
+.info-panel {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  width: 280px;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 1rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  box-shadow: 0 0 20px #00f0ff88;
+  z-index: 4;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+}
+
+.info-panel.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.info-panel h3 {
+  margin: 0 0 10px 0;
+  color: #00f0ff;
+  font-size: 1.2rem;
+}
+
+.info-panel p {
+  margin: 0 0 10px 0;
+  line-height: 1.4;
+}
+
+.info-panel ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.info-panel li {
+  margin: 5px 0;
+}
+
+.constellation.active .star {
+  background: #ffff00;
+  box-shadow: 0 0 15px #ffff00;
+  animation: none;
+}
+
+/* Galaxy info panel */
+.galaxy-info {
+  position: absolute;
+  background: rgba(138, 43, 226, 0.95);
+  color: white;
+  padding: 1rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 5;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  max-width: 320px;
+  box-shadow: 0 0 25px rgba(138, 43, 226, 0.6);
+  line-height: 1.4;
+}
+
+.galaxy-info.visible {
+  opacity: 1;
+}
+
+.galaxy-info h4 {
+  margin: 0 0 8px 0;
+  color: #ff6b9d;
+  font-size: 1.1rem;
+  text-shadow: 0 0 10px rgba(255, 107, 157, 0.5);
+}
+
+.galaxy-info .distance {
+  color: #00f0ff;
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.galaxy-info .fact {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.5rem;
+  border-radius: 6px;
+  margin: 0.5rem 0;
+  border-left: 3px solid #ff6b9d;
+}
+
+.galaxy-info .close-btn {
+  position: absolute;
+  top: 5px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.galaxy-info .close-btn:hover {
+  opacity: 1;
+}
+
+/* Control panel */
+.controls {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  z-index: 4;
+}
+
+.controls button {
+  background: rgba(0, 240, 255, 0.2);
+  border: 1px solid #00f0ff;
+  color: #00f0ff;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 0.2rem;
+  transition: all 0.3s ease;
+}
+
+.controls button:hover {
+  background: rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+}
+
+
+
+/* Mobile Responsive CSS Updates */
+
+/* Base responsive adjustments */
+
+/* Mobile-specific styles */
+/* Mobile-specific constellation star positioning and bottom controls */
+@media screen and (max-width: 1100px) {
+  /* Move control panel to bottom for mobile */
+  .controls {
+    position: fixed;
+    bottom: 70vh;
+    left: 0;
+    right: 0;
+    top: auto;
+    background: rgba(0, 0, 0, 0.95);
+    padding: 1rem;
+    border-radius: 15px 15px 0 0;
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    border-bottom: none;
+    z-index: 8;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 -5px 20px #00f0ff88;
+  }
+
+  .controls button {
+    background: rgba(0, 240, 255, 0.2);
+    border: 1px solid #00f0ff;
+    color: #00f0ff;
+    padding: 0.8rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 0.3rem;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    min-width: 140px;
+    touch-action: manipulation;
+    font-weight: 500;
+  }
+
+  .controls button:hover,
+  .controls button:active {
+    background: rgba(0, 240, 255, 0.4);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+    transform: scale(1.05);
+  }
+
+  /* Mobile constellation star positioning */
+  
+  /* Orion - positioned in upper left area */
+  #orion .star:nth-child(1) { 
+    top: 15%; 
+    left: 20%; 
+  }
+  #orion .star:nth-child(2) { 
+    top: 25%; 
+    left: 30%; 
+  }
+  #orion .star:nth-child(3) { 
+    top: 18%; 
+    left: 40%; 
+  }
+
+  /* Cassiopeia - positioned in upper right area */
+  #cassiopeia .star:nth-child(1) { 
+    top: 20%; 
+    left: 60%; 
+  }
+  #cassiopeia .star:nth-child(2) { 
+    top: 15%; 
+    left: 68%; 
+  }
+  #cassiopeia .star:nth-child(3) { 
+    top: 30%; 
+    left: 75%; 
+  }
+  #cassiopeia .star:nth-child(4) { 
+    top: 25%; 
+    left: 83%; 
+  }
+
+  /* Cygnus - positioned in lower center area */
+  #cygnus .star:nth-child(1) { 
+    top: 55%; 
+    left: 45%; 
+  }
+  #cygnus .star:nth-child(2) { 
+    top: 65%; 
+    left: 52%; 
+  }
+  #cygnus .star:nth-child(3) { 
+    top: 58%; 
+    left: 59%; 
+  }
+  #cygnus .star:nth-child(4) { 
+    top: 68%; 
+    left: 66%; 
+  }
+
+  /* Adjust constellation map padding to account for bottom controls */
+  #constellation-map {
+    margin-bottom: 100px; /* Space for bottom controls */
+  }
+
+  /* Adjust info panels to not overlap with bottom controls */
+  .info-panel {
+    bottom: 120px; /* Above the control panel */
+    max-height: calc(40vh - 120px);
+  }
+
+  .galaxy-info {
+    bottom: 120px; /* Above the control panel */
+    max-height: calc(50vh - 120px);
+  }
+}
+
+/* Extra small phones - fine-tune star positions */
+@media screen and (max-width: 480px) {
+  .controls {
+    padding: 0.8rem;
+  }
+
+  .controls button {
+    padding: 0.7rem 1rem;
+    font-size: 0.85rem;
+    min-width: 120px;
+    margin: 0.2rem;
+  }
+
+  /* Slightly adjust for very small screens */
+  #orion .star:nth-child(1) { 
+    top: 18%; 
+    left: 15%; 
+  }
+  #orion .star:nth-child(2) { 
+    top: 28%; 
+    left: 25%; 
+  }
+  #orion .star:nth-child(3) { 
+    top: 21%; 
+    left: 35%; 
+  }
+
+  #cassiopeia .star:nth-child(1) { 
+    top: 22%; 
+    left: 55%; 
+  }
+  #cassiopeia .star:nth-child(2) { 
+    top: 17%; 
+    left: 63%; 
+  }
+  #cassiopeia .star:nth-child(3) { 
+    top: 32%; 
+    left: 70%; 
+  }
+  #cassiopeia .star:nth-child(4) { 
+    top: 27%; 
+    left: 78%; 
+  }
+
+  #cygnus .star:nth-child(1) { 
+    top: 50%; 
+    left: 40%; 
+  }
+  #cygnus .star:nth-child(2) { 
+    top: 60%; 
+    left: 47%; 
+  }
+  #cygnus .star:nth-child(3) { 
+    top: 53%; 
+    left: 54%; 
+  }
+  #cygnus .star:nth-child(4) { 
+    top: 63%; 
+    left: 61%; 
+  }
+
+  /* Adjust margins for smaller screens */
+  #constellation-map {
+    margin-bottom: 90px;
+  }
+
+  .info-panel {
+    bottom: 110px;
+    max-height: calc(45vh - 110px);
+  }
+
+  .galaxy-info {
+    bottom: 110px;
+    max-height: calc(55vh - 110px);
+  }
+}
+
+/* Landscape orientation adjustments */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+  .controls {
+    padding: 0.8rem;
+  }
+
+  .controls button {
+    margin: 0.2rem 0.4rem;
+    padding: 0.6rem 1rem;
+    min-width: 120px;
+  }
+
+  #constellation-map {
+    margin-bottom: 80px;
+  }
+
+  .info-panel {
+    bottom: 100px;
+    max-height: calc(35vh - 100px);
+  }
+
+  .galaxy-info {
+    bottom: 100px;
+    max-height: calc(40vh - 100px);
+  }
+
+  /* Adjust star positions for landscape */
+  #orion .star:nth-child(1) { top: 20%; left: 18%; }
+  #orion .star:nth-child(2) { top: 35%; left: 28%; }
+  #orion .star:nth-child(3) { top: 25%; left: 38%; }
+
+  #cassiopeia .star:nth-child(1) { top: 25%; left: 58%; }
+  #cassiopeia .star:nth-child(2) { top: 20%; left: 66%; }
+  #cassiopeia .star:nth-child(3) { top: 40%; left: 73%; }
+  #cassiopeia .star:nth-child(4) { top: 35%; left: 81%; }
+
+  #cygnus .star:nth-child(1) { top: 60%; left: 42%; }
+  #cygnus .star:nth-child(2) { top: 75%; left: 49%; }
+  #cygnus .star:nth-child(3) { top: 65%; left: 56%; }
+  #cygnus .star:nth-child(4) { top: 80%; left: 63%; }
+}
+
+/* Extra small phones */
+/* Mobile-specific constellation star positioning and bottom controls */
+@media screen and (max-width: 1100px) {
+  /* Move control panel to bottom for mobile */
+  .controls {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    background: rgba(0, 0, 0, 0.95);
+    padding: 1rem;
+    border-radius: 15px 15px 0 0;
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    border-bottom: none;
+    z-index: 8;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 -5px 20px #00f0ff88;
+  }
+
+  .controls button {
+    background: rgba(0, 240, 255, 0.2);
+    border: 1px solid #00f0ff;
+    color: #00f0ff;
+    padding: 0.8rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 0.3rem;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    min-width: 140px;
+    touch-action: manipulation;
+    font-weight: 500;
+  }
+
+  .controls button:hover,
+  .controls button:active {
+    background: rgba(0, 240, 255, 0.4);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+    transform: scale(1.05);
+  }
+
+  /* Mobile constellation star positioning */
+  
+  /* Orion - positioned in upper left area */
+  #orion .star:nth-child(1) { 
+    top: 15%; 
+    left: 20%; 
+  }
+  #orion .star:nth-child(2) { 
+    top: 25%; 
+    left: 30%; 
+  }
+  #orion .star:nth-child(3) { 
+    top: 18%; 
+    left: 40%; 
+  }
+
+  /* Cassiopeia - positioned in upper right area */
+  #cassiopeia .star:nth-child(1) { 
+    top: 20%; 
+    left: 60%; 
+  }
+  #cassiopeia .star:nth-child(2) { 
+    top: 15%; 
+    left: 68%; 
+  }
+  #cassiopeia .star:nth-child(3) { 
+    top: 30%; 
+    left: 75%; 
+  }
+  #cassiopeia .star:nth-child(4) { 
+    top: 25%; 
+    left: 83%; 
+  }
+
+  /* Cygnus - positioned in lower center area */
+  #cygnus .star:nth-child(1) { 
+    top: 55%; 
+    left: 45%; 
+  }
+  #cygnus .star:nth-child(2) { 
+    top: 65%; 
+    left: 52%; 
+  }
+  #cygnus .star:nth-child(3) { 
+    top: 58%; 
+    left: 59%; 
+  }
+  #cygnus .star:nth-child(4) { 
+    top: 68%; 
+    left: 66%; 
+  }
+
+  /* Adjust constellation map padding to account for bottom controls */
+  #constellation-map {
+    margin-bottom: 100px; /* Space for bottom controls */
+  }
+
+  /* Adjust info panels to not overlap with bottom controls */
+  .info-panel {
+    bottom: 120px; /* Above the control panel */
+    max-height: calc(40vh - 120px);
+  }
+
+  .galaxy-info {
+    bottom: 120px; /* Above the control panel */
+    max-height: calc(50vh - 120px);
+  }
+}
+
+/* Extra small phones - fine-tune star positions */
+@media screen and (max-width: 480px) {
+  .controls {
+    padding: 0.8rem;
+  }
+
+  .controls button {
+    padding: 0.7rem 1rem;
+    font-size: 0.85rem;
+    min-width: 120px;
+    margin: 0.2rem;
+  }
+
+  /* Slightly adjust for very small screens */
+  #orion .star:nth-child(1) { 
+    top: 18%; 
+    left: 15%; 
+  }
+  #orion .star:nth-child(2) { 
+    top: 28%; 
+    left: 25%; 
+  }
+  #orion .star:nth-child(3) { 
+    top: 21%; 
+    left: 35%; 
+  }
+
+  #cassiopeia .star:nth-child(1) { 
+    top: 22%; 
+    left: 55%; 
+  }
+  #cassiopeia .star:nth-child(2) { 
+    top: 17%; 
+    left: 63%; 
+  }
+  #cassiopeia .star:nth-child(3) { 
+    top: 32%; 
+    left: 70%; 
+  }
+  #cassiopeia .star:nth-child(4) { 
+    top: 27%; 
+    left: 78%; 
+  }
+
+  #cygnus .star:nth-child(1) { 
+    top: 50%; 
+    left: 40%; 
+  }
+  #cygnus .star:nth-child(2) { 
+    top: 60%; 
+    left: 47%; 
+  }
+  #cygnus .star:nth-child(3) { 
+    top: 53%; 
+    left: 54%; 
+  }
+  #cygnus .star:nth-child(4) { 
+    top: 63%; 
+    left: 61%; 
+  }
+
+  /* Adjust margins for smaller screens */
+  #constellation-map {
+    margin-bottom: 90px;
+  }
+
+  .info-panel {
+    bottom: 110px;
+    max-height: calc(45vh - 110px);
+  }
+
+  .galaxy-info {
+    bottom: 110px;
+    max-height: calc(55vh - 110px);
+  }
+}
+
+/* Landscape orientation adjustments */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+  .controls {
+    padding: 0.8rem;
+  }
+
+  .controls button {
+    margin: 0.2rem 0.4rem;
+    padding: 0.6rem 1rem;
+    min-width: 120px;
+  }
+
+  #constellation-map {
+    margin-bottom: 80px;
+  }
+
+  .info-panel {
+    bottom: 100px;
+    max-height: calc(35vh - 100px);
+  }
+
+  .galaxy-info {
+    bottom: 100px;
+    max-height: calc(40vh - 100px);
+  }
+
+  /* Adjust star positions for landscape */
+  #orion .star:nth-child(1) { top: 20%; left: 18%; }
+  #orion .star:nth-child(2) { top: 35%; left: 28%; }
+  #orion .star:nth-child(3) { top: 25%; left: 38%; }
+
+  #cassiopeia .star:nth-child(1) { top: 25%; left: 58%; }
+  #cassiopeia .star:nth-child(2) { top: 20%; left: 66%; }
+  #cassiopeia .star:nth-child(3) { top: 40%; left: 73%; }
+  #cassiopeia .star:nth-child(4) { top: 35%; left: 81%; }
+
+  #cygnus .star:nth-child(1) { top: 60%; left: 42%; }
+  #cygnus .star:nth-child(2) { top: 75%; left: 49%; }
+  #cygnus .star:nth-child(3) { top: 65%; left: 56%; }
+  #cygnus .star:nth-child(4) { top: 80%; left: 63%; }
+}
+
+/* Landscape orientation on mobile */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+  #constellation-map {
+    height: 85vh;
+    min-height: 300px;
+  }
+
+  .info-panel {
+    max-height: 35vh;
+  }
+
+  .galaxy-info {
+    max-height: 40vh;
+  }
+
+  .controls {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .controls button {
+    margin: 0.1rem 0.3rem;
+  }
+}
+
+/* High DPI displays */
+@media screen and (-webkit-min-device-pixel-ratio: 2), 
+       screen and (min-resolution: 192dpi) {
+  .star {
+    box-shadow: 0 0 12px white, 0 0 8px white;
+  }
+  
+  .galaxy {
+    box-shadow: 0 0 20px rgba(138, 43, 226, 0.4);
+  }
+  
+  .constellation-line {
+    filter: drop-shadow(0 0 4px #00f0ff);
+  }
+}

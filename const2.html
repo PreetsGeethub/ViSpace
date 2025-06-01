@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Interactive Constellation Map</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    .header {
+      text-align: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #001f3f, #000814);
+    }
+
+    .header h1 {
+      color: #00f0ff;
+      font-size: clamp(1.5rem, 5vw, 2.5rem);
+      margin-bottom: 10px;
+      text-shadow: 0 0 20px #00f0ff;
+    }
+
+    .header p {
+      color: #ccc;
+      font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+    }
+
+    #constellation-map {
+      position: relative;
+      width: min(95vw, 1200px);
+      height: min(70vh, 800px);
+      background: linear-gradient(135deg, #001f3f 0%, #000814 50%, #1a0033 100%);
+      border-radius: 15px;
+      margin: 20px auto;
+      box-shadow: 0 0 30px #00f0ff88;
+      overflow: hidden;
+      border: 2px solid #00f0ff33;
+    }
+
+    #global-lines {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .constellation {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      color: transparent;
+    }
+
+    /* Different star sizes and colors based on magnitude */
+    .star.magnitude-0 {
+      width: 16px;
+      height: 16px;
+      background: #ffffff;
+      box-shadow: 0 0 12px #ffffff;
+    }
+
+    .star.magnitude-1 {
+      width: 14px;
+      height: 14px;
+      background: #ffffcc;
+      box-shadow: 0 0 10px #ffffcc;
+    }
+
+    .star.magnitude-2 {
+      width: 12px;
+      height: 12px;
+      background: #ffcc99;
+      box-shadow: 0 0 8px #ffcc99;
+    }
+
+    .star.magnitude-3 {
+      width: 10px;
+      height: 10px;
+      background: #ff6666;
+      box-shadow: 0 0 6px #ff6666;
+    }
+
+    .star.variable {
+      animation: twinkle 2s infinite;
+    }
+
+    .star.binary {
+      background: linear-gradient(45deg, #ffffff, #00f0ff);
+    }
+
+    .star.supergiant {
+      background: #ff4444;
+      box-shadow: 0 0 20px #ff4444;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.8); }
+    }
+
+    .star.selected,
+    .star:hover {
+      background: #00f0ff !important;
+      box-shadow: 0 0 25px #00f0ff, 0 0 35px #00f0ff88 !important;
+      transform: scale(1.3);
+    }
+
+    .constellation-line {
+      stroke: #00f0ff;
+      stroke-width: 2;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      filter: drop-shadow(0 0 5px #00f0ff);
+    }
+
+    .constellation-line.visible {
+      opacity: 0.8;
+    }
+
+    .info-panel {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      width: min(320px, 90vw);
+      max-height: 60vh;
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 1rem;
+      border-radius: 15px;
+      font-size: clamp(0.8rem, 2vw, 0.9rem);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+      box-shadow: 0 0 25px #00f0ff88;
+      z-index: 3;
+      border: 1px solid #00f0ff44;
+      overflow-y: auto;
+    }
+
+    .info-panel.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .info-panel h3 {
+      margin: 0 0 10px 0;
+      color: #00f0ff;
+      font-size: clamp(1.1rem, 3vw, 1.3rem);
+      text-shadow: 0 0 10px #00f0ff;
+    }
+
+    .info-panel p {
+      margin: 0 0 10px 0;
+      line-height: 1.5;
+    }
+
+    .info-panel .distance {
+      color: #ffaa00;
+      font-weight: bold;
+    }
+
+    .info-panel .fun-fact {
+      background: rgba(0, 240, 255, 0.1);
+      padding: 10px;
+      border-radius: 8px;
+      margin: 10px 0;
+      border-left: 3px solid #00f0ff;
+    }
+
+    .info-panel .stars-list {
+      margin: 10px 0;
+    }
+
+    .info-panel .star-detail {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 5px;
+      font-size: 0.85em;
+    }
+
+    .constellation.active .star {
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .controls {
+      text-align: center;
+      padding: 20px;
+      background: rgba(0, 31, 63, 0.5);
+    }
+
+    .controls button {
+      background: linear-gradient(45deg, #00f0ff, #0080ff);
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: clamp(0.8rem, 2vw, 1rem);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 240, 255, 0.3);
+    }
+
+    .controls button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 240, 255, 0.6);
+    }
+
+    /* Mobile-specific adjustments */
+    @media (max-width: 768px) {
+      .info-panel {
+        position: fixed;
+        bottom: 0px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        border-radius: 15px 15px 0 0;
+        max-height: 50vh;
+        opacity: 0.8;
+      }
+      
+      .star {
+        min-width: 20px;
+        min-height: 20px;
+      }
+      
+      #constellation-map {
+        height: 60vh;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header {
+        padding: 15px 10px;
+      }
+      
+      .info-panel {
+        max-height: 45vh;
+        padding: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>✨ Interactive Star Map ✨</h1>
+    <p>Explore the cosmos and discover fascinating stellar objects</p>
+  </div>
+
+  <section id="constellation-map">
+    <svg id="global-lines" width="100%" height="100%">
+      <!-- Orion lines -->
+      <line id="orion-line1" class="constellation-line" data-constellation="orion"></line>
+      <line id="orion-line2" class="constellation-line" data-constellation="orion"></line>
+      <line id="orion-line3" class="constellation-line" data-constellation="orion"></line>
+      <line id="orion-line4" class="constellation-line" data-constellation="orion"></line>
+      <line id="orion-line5" class="constellation-line" data-constellation="orion"></line>
+      
+      <!-- Pleiades lines -->
+      <line id="pleiades-line1" class="constellation-line" data-constellation="pleiades"></line>
+      <line id="pleiades-line2" class="constellation-line" data-constellation="pleiades"></line>
+      <line id="pleiades-line3" class="constellation-line" data-constellation="pleiades"></line>
+      <line id="pleiades-line4" class="constellation-line" data-constellation="pleiades"></line>
+      <line id="pleiades-line5" class="constellation-line" data-constellation="pleiades"></line>
+      <line id="pleiades-line6" class="constellation-line" data-constellation="pleiades"></line>
+      
+      <!-- Scorpius lines -->
+      <line id="scorpius-line1" class="constellation-line" data-constellation="scorpius"></line>
+      <line id="scorpius-line2" class="constellation-line" data-constellation="scorpius"></line>
+      <line id="scorpius-line3" class="constellation-line" data-constellation="scorpius"></line>
+      <line id="scorpius-line4" class="constellation-line" data-constellation="scorpius"></line>
+      <line id="scorpius-line5" class="constellation-line" data-constellation="scorpius"></line>
+      
+      <!-- Vega lines -->
+      <line id="vega-line1" class="constellation-line" data-constellation="vega"></line>
+      <line id="vega-line2" class="constellation-line" data-constellation="vega"></line>
+      <line id="vega-line3" class="constellation-line" data-constellation="vega"></line>
+      
+      <!-- Andromeda lines -->
+      <line id="andromeda-line1" class="constellation-line" data-constellation="andromeda"></line>
+      <line id="andromeda-line2" class="constellation-line" data-constellation="andromeda"></line>
+      <line id="andromeda-line3" class="constellation-line" data-constellation="andromeda"></line>
+      <line id="andromeda-line4" class="constellation-line" data-constellation="andromeda"></line>
+    </svg>
+
+    <!-- Orion (The Hunter) -->
+    <div class="constellation" id="orion" data-name="Orion">
+      <!-- Betelgeuse (Red Supergiant) -->
+      <div class="star magnitude-0 supergiant variable" id="orion-star1" style="top: 15%; left: 15%;" data-name="Betelgeuse"></div>
+      <!-- Rigel (Blue Supergiant) -->
+      <div class="star magnitude-0" id="orion-star2" style="top: 65%; left: 25%;" data-name="Rigel"></div>
+      <!-- Alnitak (Belt star 1) -->
+      <div class="star magnitude-1" id="orion-star3" style="top: 40%; left: 20%;" data-name="Alnitak"></div>
+      <!-- Alnilam (Belt star 2) -->
+      <div class="star magnitude-1" id="orion-star4" style="top: 42%; left: 25%;" data-name="Alnilam"></div>
+      <!-- Mintaka (Belt star 3) -->
+      <div class="star magnitude-1" id="orion-star5" style="top: 44%; left: 30%;" data-name="Mintaka"></div>
+      <!-- Saiph -->
+      <div class="star magnitude-2" id="orion-star6" style="top: 70%; left: 18%;" data-name="Saiph"></div>
+    </div>
+
+    <!-- Pleiades (Seven Sisters) -->
+    <div class="constellation" id="pleiades" data-name="Pleiades">
+      <!-- Alcyone (Brightest) -->
+      <div class="star magnitude-1" id="pleiades-star1" style="top: 20%; left: 55%;" data-name="Alcyone"></div>
+      <!-- Maia -->
+      <div class="star magnitude-2" id="pleiades-star2" style="top: 15%; left: 60%;" data-name="Maia"></div>
+      <!-- Electra -->
+      <div class="star magnitude-2" id="pleiades-star3" style="top: 25%; left: 58%;" data-name="Electra"></div>
+      <!-- Taygeta -->
+      <div class="star magnitude-2" id="pleiades-star4" style="top: 22%; left: 52%;" data-name="Taygeta"></div>
+      <!-- Asterope -->
+      <div class="star magnitude-3" id="pleiades-star5" style="top: 18%; left: 56%;" data-name="Asterope"></div>
+      <!-- Celaeno -->
+      <div class="star magnitude-3" id="pleiades-star6" style="top: 28%; left: 55%;" data-name="Celaeno"></div>
+      <!-- Merope -->
+      <div class="star magnitude-2" id="pleiades-star7" style="top: 30%; left: 60%;" data-name="Merope"></div>
+    </div>
+
+    <!-- Scorpius (The Scorpion) -->
+    <div class="constellation" id="scorpius" data-name="Scorpius">
+      <!-- Antares (Red Supergiant) -->
+      <div class="star magnitude-0 supergiant variable" id="scorpius-star1" style="top: 60%; left: 45%;" data-name="Antares"></div>
+      <!-- Shaula -->
+      <div class="star magnitude-1" id="scorpius-star2" style="top: 75%; left: 55%;" data-name="Shaula"></div>
+      <!-- Sargas -->
+      <div class="star magnitude-1" id="scorpius-star3" style="top: 70%; left: 50%;" data-name="Sargas"></div>
+      <!-- Dschubba -->
+      <div class="star magnitude-2" id="scorpius-star4" style="top: 50%; left: 42%;" data-name="Dschubba"></div>
+      <!-- Graffias -->
+      <div class="star magnitude-2 binary" id="scorpius-star5" style="top: 45%; left: 40%;" data-name="Graffias"></div>
+    </div>
+
+    <!-- Lyra (featuring Vega) -->
+    <div class="constellation" id="vega" data-name="Lyra">
+      <!-- Vega (Former Pole Star) -->
+      <div class="star magnitude-0" id="vega-star1" style="top: 25%; left: 80%;" data-name="Vega"></div>
+      <!-- Sheliak -->
+      <div class="star magnitude-2 binary" id="vega-star2" style="top: 35%; left: 85%;" data-name="Sheliak"></div>
+      <!-- Sulafat -->
+      <div class="star magnitude-2" id="vega-star3" style="top: 30%; left: 78%;" data-name="Sulafat"></div>
+    </div>
+
+    <!-- Andromeda -->
+    <div class="constellation" id="andromeda" data-name="Andromeda">
+      <!-- Alpheratz -->
+      <div class="star magnitude-1" id="andromeda-star1" style="top: 35%; left: 75%;" data-name="Alpheratz"></div>
+      <!-- Mirach -->
+      <div class="star magnitude-1 variable" id="andromeda-star2" style="top: 45%; left: 72%;" data-name="Mirach"></div>
+      <!-- Almach -->
+      <div class="star magnitude-1 binary" id="andromeda-star3" style="top: 55%; left: 68%;" data-name="Almach"></div>
+      <!-- Sadiradra -->
+      <div class="star magnitude-2" id="andromeda-star4" style="top: 40%; left: 78%;" data-name="Sadiradra"></div>
+    </div>
+
+    <!-- Info Panel -->
+    <div id="constellation-info" class="info-panel"></div>
+  </section>
+
+  <div class="controls">
+    <button onclick="showRandomConstellation()">🎲 Random Constellation</button>
+    <button onclick="clearAll()">🌌 Clear View</button>
+    <button onclick="showAllConstellations()">✨ Show All</button>
+    <button onclick="back()">Back</button>
+  </div>
+<script src="./js/constt.js"></script>
+  </body>
+  </html>
